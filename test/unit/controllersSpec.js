@@ -40,5 +40,15 @@ describe('controllers', function(){
       expect(scope.tabla['2'].B.length).toBe(0);
       expect(scope.tabla['2'].C.length).toBe(1);
     }));
+    it('debe poder agregar un evento y mandarlo a backend', inject(function(_$httpBackend_, $rootScope, $controller) {
+      var $httpBackend = _$httpBackend_;
+      var scope = {};
+      var ctrl = $controller('TablaCtrl', { $scope: scope});
+      scope.nuevo_evento = { fecha: 1, lugar: 'A', descripcion: "descripcion11" };
+      $httpBackend.expectGET('eventos.json').respond([]);
+      $httpBackend.expectGET('evento/guardar?obj='+JSON.stringify(scope.nuevo_evento)).respond({ fecha: 1, lugar: 'A', descripcion: "descripcion1" });
+      $httpBackend.expectGET('eventos.json').respond([]);
+      scope.agregar_evento();
+    }));
   });
 });
