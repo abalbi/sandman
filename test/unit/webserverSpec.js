@@ -28,6 +28,48 @@ describe("MongoDB", function() {
   });
 });
 
+describe("Proyectos", function(){
+  it("debe guardar en session el key de proyecto recibido por param", function(next){
+    var config = require('../../config')('test');
+    var proyecto = require('../../routes/proyecto');
+    var sess = {}; 
+    proyecto.comprobar({
+      session:sess,
+      param: function() {return 'qwerty'}
+    },{},function(){
+      expect(sess.proyecto).toBe('qwerty');
+      next();
+    });
+  });
+  it("debe guardar en session el key de proyecto recibido por param si tiene un proyecto en session", function(next){
+    var config = require('../../config')('test');
+    var proyecto = require('../../routes/proyecto');
+    var sess = {proyecto:"asdfgh"}; 
+    proyecto.comprobar({
+      session:sess,
+      param: function() {return 'qwerty'}
+    },{},function(){
+      expect(sess.proyecto).toBe('qwerty');
+      next();
+    });
+  });
+  it("debe guardar un nuevo proyecto", function(){
+    var config = require('../../config')('test');
+    var proyecto = require('../../routes/proyecto');
+    var MongoClient = require('mongodb').MongoClient;
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('proyectos', function(err, collection){
+        collection.drop();
+        proyecto.guardar(db, {nombre: "Proyecto0"}, function(err, docs){
+          expect(docs[0]._id).not.toBe(null);
+        });
+      });
+    });
+  });
+});
+
+
+
 describe("Eventos", function(){
   it("debe guardar un nuevo evento", function(next) {
     var config = require('../../config')('test');

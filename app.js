@@ -7,6 +7,7 @@ var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
 var evento = require('./routes/evento');
+var proyecto = require('./routes/proyecto');
 var http = require('http');
 var path = require('path');
 var config = require('./config')();
@@ -42,6 +43,7 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
             req.db = db;
             next();
         };
+        app.all('*', attachDB, proyecto.comprobar )
         app.get('/', attachDB, routes.index);
         app.get('/users', attachDB, user.list);
         app.get('/eventos.json', attachDB, evento.list);
