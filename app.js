@@ -43,18 +43,7 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
             req.db = db;
             next();
         };
-        var attachSession = function(req, res, next) {
-          var db = req.db;
-          if(!req.session.proyecto) {
-            req.session.proyecto = '__default__';
-          }
-          if(req.param('proyecto')) {
-            req.session.proyecto = req.param('proyecto');
-          }
-          proyecto.modelo._id = req.session.proyecto;
-          proyecto.modelo.db = db;
-          next();
-        };
+        var attachSession = proyecto.comprobar;
         app.get('/', attachDB, routes.index);
         app.get('/users', attachDB, attachSession, user.list);
         app.get('/eventos.json', attachDB, attachSession, evento.list);

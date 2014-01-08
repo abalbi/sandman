@@ -19,7 +19,7 @@ var modelo = {
         });
       }
     });  
-  } 
+  }
 };
 
 exports.comprobar = function(req, res, cb){
@@ -32,7 +32,7 @@ exports.comprobar = function(req, res, cb){
   }
   modelo._id = req.session.proyecto;
   modelo.db = db;
-  cb(req, res);
+  cb();
 };
 
 exports.guardar = function(db, obj, cb){
