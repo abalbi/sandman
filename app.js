@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
-app.use(express.session());
+app.use(express.session({secret: 'qwerty'}));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -43,11 +43,10 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
             req.db = db;
             next();
         };
-        app.all('*', attachDB, proyecto.comprobar )
         app.get('/', attachDB, routes.index);
         app.get('/users', attachDB, user.list);
         app.get('/eventos.json', attachDB, evento.list);
-        app.get('/eventos', attachDB, evento.tabla);
+        app.get('/eventos.html', attachDB, evento.tabla);
         app.get('/evento/guardar', attachDB, evento.guardar);
         http.createServer(app).listen(config.port, function(){
             console.log('Express server listening on port ' + config.port);

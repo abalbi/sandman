@@ -3,6 +3,7 @@
  * GET eventos listing.
  */
 var ObjectID = require('mongodb').ObjectID;
+var proyecto = require('./proyecto');
 
 exports.list = function(req, res){
   var db = req.db;
@@ -13,7 +14,9 @@ exports.list = function(req, res){
 };
 
 exports.tabla = function(req, res){
-  res.render('tabla', { title: 'Tabla' });
+  proyecto.comprobar(req, res, function() {
+    res.render('tabla', { title: 'Tabla' });
+  });
 };
 
 exports.traer = function(req, res) {

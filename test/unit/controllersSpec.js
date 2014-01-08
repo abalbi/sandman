@@ -47,7 +47,6 @@ describe('controllers', function(){
       scope.nuevo_evento = { fecha: 1, lugar: 'A', descripcion: "descripcion11" };
       $httpBackend.expectGET('eventos.json').respond([]);
       $httpBackend.expectGET('evento/guardar?obj='+JSON.stringify(scope.nuevo_evento)).respond({ fecha: 1, lugar: 'A', descripcion: "descripcion1" });
-      $httpBackend.expectectGET('eventos.json').respond([]);
       scope.agregar_evento();
     }));
   });
