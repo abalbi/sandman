@@ -14,9 +14,7 @@ exports.list = function(req, res){
 };
 
 exports.tabla = function(req, res){
-  proyecto.comprobar(req, res, function() {
-    res.render('tabla', { title: 'Tabla' });
-  });
+  res.render('tabla', { title: 'Tabla' });
 };
 
 exports.traer = function(req, res) {
@@ -30,18 +28,21 @@ exports.traer = function(req, res) {
 exports.guardar = function(req, res){
   var db = req.db;
   var obj = JSON.parse(req.param('obj'));
-  var eventos = db.collection('eventos');
-  if(obj._id) {
-    var query = {_id:new ObjectID(obj._id)};
-    delete obj._id;
-    eventos.update(query,obj,{},function(err, docs){
-      eventos.find({"_id": query._id}).toArray(function (err, docs){
+  proyecto.modelo.actual(function(proy){
+    obj.proyecto = proy._id;
+    var eventos = db.collection('eventos');
+    if(obj._id) {
+      var query = {_id:new ObjectID(obj._id)};
+      delete obj._id;
+      eventos.update(query,obj,{},function(err, docs){
+        eventos.find({"_id": query._id}).toArray(function (err, docs){
+          res.send(docs[0]);
+        });
+      });
+    } else {
+      eventos.insert(obj,function(err, docs){
         res.send(docs[0]);
       });
-    });
-  } else {
-    eventos.insert(obj,function(err, docs){
-      res.send(docs[0]);
-    });
-  }
+    }
+  });
 };

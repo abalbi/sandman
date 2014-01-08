@@ -2,6 +2,12 @@
 
 /* jasmine specs for controllers go here */
 
+var proyecto;
+var evento;
+var config;
+var MongoClient;
+var db;
+
 describe('WebServer', function(){
   describe('Config', function(){
     it('debe cargar las configuraciones de dev', function(next) {
@@ -29,14 +35,10 @@ describe("MongoDB", function() {
 });
 
 describe("Proyectos", function(){
-  var proyecto;
-  var config;
-  var MongoClient;
   beforeEach(function(){
     proyecto = require('../../routes/proyecto');
     config = require('../../config')('test');
     MongoClient = require('mongodb').MongoClient;
-
   });
   it('debe si no tiene proyecto de session definir __default__ y debe traerlo como actual', function() {
     var sess = {}; 
@@ -93,42 +95,20 @@ describe("Proyectos", function(){
       });
     });
   })
-  it('debe existir siempre un proyecto __default__', function() {
-    var MongoClient = require('mongodb').MongoClient;
-    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
-      db.collection('proyectos', function(err, collection){
-        collection.drop();
-        proyecto.modelo.db = db;
-        proyecto.modelo._id = '';
-        proyecto.modelo.actual(function(proyecto){
-          expect(proyecto._id).toBe('__default__');
-        });
-      })      
-    })
-  })
-  it('debe buscar el proyecto que se llama', function() {
-    var MongoClient = require('mongodb').MongoClient;
-    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
-      db.collection('proyectos', function(err, collection){
-        collection.drop();
-        collection.insert({_id:'__algun_id_de_proyecto__', nombre: 'Proyecto0'}, function(){
-          proyecto.modelo.db = db;
-          proyecto.modelo._id = '__algun_id_de_proyecto__';
-          proyecto.modelo.actual(function(proyecto){
-            expect(proyecto._id).toBe('__algun_id_de_proyecto__');
-          });
-        });
-      })      
-    })
-  })
 });
 
 describe("Eventos", function(){
+  beforeEach(function(){
+    proyecto = require('../../routes/proyecto');
+    proyecto.modelo._id = '__default__';
+    config = require('../../config')('test');
+    MongoClient = require('mongodb').MongoClient;
+    evento = require('../../routes/evento');
+  });
+
   it("debe guardar un nuevo evento", function(next) {
-    var config = require('../../config')('test');
-    var evento = require('../../routes/evento');
-    var MongoClient = require('mongodb').MongoClient;
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      proyecto.modelo.db = db;
       db.collection('eventos', function(err, collection){
         collection.drop();
         evento.guardar({
@@ -141,6 +121,7 @@ describe("Eventos", function(){
             expect(docs.lugar).toBe('Lugar1');
             expect(docs.descripcion).toBe('Descripcion Lugar1 1 NUEVO');
             expect(docs.fecha).toBe('1');
+            expect(docs.proyecto).toBe('__default__');
             next();
           }
         });
@@ -148,10 +129,8 @@ describe("Eventos", function(){
     });
   });
   it("debe guardar un evento guardado", function(next) {
-    var config = require('../../config')('test');
-    var evento = require('../../routes/evento');
-    var MongoClient = require('mongodb').MongoClient;
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      proyecto.modelo.db = db;
       db.collection('eventos', function(err, collection){
         collection.drop();
         collection.insert([{"lugar":"Lugar1","fecha":"1","descripcion":"Descripcion Lugar1 1 NUEVO"}],function(err, result){
@@ -167,7 +146,7 @@ describe("Eventos", function(){
               expect(docs.lugar).toBe('Lugar1');
               expect(docs.descripcion).toBe('Descripcion Lugar1 1 CAMBIADO');
               expect(docs.fecha).toBe('1');
-              //expect(docs._id).toBe(new ObjectID(id));
+              expect(docs.proyecto).toBe('__default__');
               next();
             }
           });
@@ -176,9 +155,6 @@ describe("Eventos", function(){
     });
   });
   it("debe traer la lista de eventos", function(next) {
-    var config = require('../../config')('test');
-    var evento = require('../../routes/evento');
-    var MongoClient = require('mongodb').MongoClient;
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       db.collection('eventos', function(err, collection){
         collection.drop();
@@ -196,9 +172,6 @@ describe("Eventos", function(){
     });
   });
   it("debe traer un evento en particular", function(next) {
-    var config = require('../../config')('test');
-    var evento = require('../../routes/evento');
-    var MongoClient = require('mongodb').MongoClient;
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       db.collection('eventos', function(err, collection){
         collection.drop();

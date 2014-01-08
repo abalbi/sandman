@@ -43,11 +43,24 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
             req.db = db;
             next();
         };
+        var attachSession = function(req, res, next) {
+          var db = req.db;
+          if(!req.session.proyecto) {
+            req.session.proyecto = '__default__';
+          }
+          if(req.param('proyecto')) {
+            req.session.proyecto = req.param('proyecto');
+          }
+          proyecto.modelo._id = req.session.proyecto;
+          proyecto.modelo.db = db;
+          next();
+        };
         app.get('/', attachDB, routes.index);
-        app.get('/users', attachDB, user.list);
-        app.get('/eventos.json', attachDB, evento.list);
-        app.get('/eventos.html', attachDB, evento.tabla);
-        app.get('/evento/guardar', attachDB, evento.guardar);
+        app.get('/users', attachDB, attachSession, user.list);
+        app.get('/eventos.json', attachDB, attachSession, evento.list);
+        app.get('/eventos.html', attachDB, attachSession, evento.tabla);
+        app.get('/evento/guardar', attachDB, attachSession, evento.guardar);
+        app.get('/proyecto.json', attachDB, attachSession, proyecto.traer);
         http.createServer(app).listen(config.port, function(){
             console.log('Express server listening on port ' + config.port);
         });

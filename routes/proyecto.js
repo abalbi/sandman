@@ -40,6 +40,12 @@ exports.guardar = function(db, obj, cb){
   proyectos.insert(obj,cb);
 };
 
+exports.traer = function(req, res) {
+  modelo.actual(function(proy){
+    res.send(proy);
+  });
+}
+
 exports.modelo = modelo;
 
 
