@@ -17,7 +17,7 @@ describe('controllers', function(){
         lugar: 'A',
         descripcion: "descripcion"
       });
-      expect(scope.tabla['1'].A[0].descripcion).toBe('descripcion');
+      expect(scope.tabla['1970:01:02:00:00:00'].data.A[0].descripcion).toBe('descripcion');
     }));
     var $httpBackend;
     it('debe cargar todos los eventos en la tabla', inject(function(_$httpBackend_, $rootScope, $controller) {
@@ -33,12 +33,13 @@ describe('controllers', function(){
       var ctrl = $controller('TablaCtrl', { $scope: scope});
       scope.tabla = {};
       $httpBackend.flush();
-      expect(scope.tabla['1'].A.length).toBe(2);
-      expect(scope.tabla['1'].B.length).toBe(1);
-      expect(scope.tabla['1'].C.length).toBe(0);
-      expect(scope.tabla['2'].A.length).toBe(1);
-      expect(scope.tabla['2'].B.length).toBe(0);
-      expect(scope.tabla['2'].C.length).toBe(1);
+      console.log(scope.tabla);
+      expect(scope.tabla['1970:01:02:00:00:00'].data.A.length).toBe(2);
+      expect(scope.tabla['1970:01:02:00:00:00'].data.B.length).toBe(1);
+      expect(scope.tabla['1970:01:02:00:00:00'].data.C.length).toBe(0);
+      expect(scope.tabla['1970:01:03:00:00:00'].data.A.length).toBe(1);
+      expect(scope.tabla['1970:01:03:00:00:00'].data.B.length).toBe(0);
+      expect(scope.tabla['1970:01:03:00:00:00'].data.C.length).toBe(1);
     }));
     it('debe poder agregar un evento y mandarlo a backend', inject(function(_$httpBackend_, $rootScope, $controller) {
       var $httpBackend = _$httpBackend_;

@@ -30,12 +30,9 @@ block content
         tbody
           tr(ng-repeat="(fecha, eventos) in tabla")
             td
-              {{fecha}}
-            td(ng-repeat="(lugar, evento) in eventos")
+              {{mostrar_fecha(fecha)}}
+            td(ng-repeat="(lugar, evento) in eventos.data")
               div(ng-repeat="(key, item) in evento")
                 span(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}") {{item.descripcion}}
-      {{eventos|json}}
-      {{tabla|json}}
-
 
 
