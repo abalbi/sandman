@@ -25,6 +25,16 @@ exports.traer = function(req, res) {
   });
 }
 
+exports.borrar = function(req, res) {
+  var db = req.db;
+  var eventos = db.collection('eventos');
+  console.log(req.param('_id'));
+  eventos.remove({"_id": new ObjectID(req.param('_id'))}, {w:0}, function(err, docs){
+    console.log(err);
+    res.send([]);
+  });
+}
+
 exports.guardar = function(req, res){
   var db = req.db;
   var obj = JSON.parse(req.param('obj'));

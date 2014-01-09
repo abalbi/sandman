@@ -10,6 +10,7 @@ angular.module('burgo.controllers', []).
       return fecha;
     };
     $scope.fecha_convertir = function(fecha) {
+      if(typeof fecha == 'undefined') fecha = 0;
       fecha = fecha.toString();
       if(fecha.match(/\d+\:\d+\:\d+\:\d+\:\d+\:\d+/)) {
         return fecha;
@@ -17,7 +18,7 @@ angular.module('burgo.controllers', []).
       var letras = {y:0, m:1, d:2, h:3, n:4, s:5};
       var array = $scope.fecha_inicio().split(':');
       var string = fecha;
-      var re = /(\d+)([y|m|d|h|n|s]*)/;
+      var re = /(\-*\d+)([y|m|d|h|n|s]*)/;
       var res;
       while(res = string.match(re)) {
         if(!res[2]) {
@@ -44,7 +45,15 @@ angular.module('burgo.controllers', []).
       $scope.nuevo_evento._id = item._id;
       $scope.nuevo_evento.descripcion = item.descripcion;
     }
-    $scope.agregar_evento = function(){
+    $scope.borrar_evento = function(_id) {
+      $http.get('evento/borrar?_id='+_id).success(function(data){
+        $scope.tabla_evento(data);
+        $scope.tabla_cargar_eventos($http);
+        $scope.nuevo_evento = {};
+        $scope.mostrar_evento = false;
+      });
+    }
+    $scope.guardar_evento = function(){
       if ($scope.nuevo_evento.fecha && $scope.nuevo_evento.lugar && $scope.nuevo_evento.descripcion) {
         $http.get('evento/guardar?obj='+JSON.stringify($scope.nuevo_evento)).success(function(data){
           $scope.tabla_evento(data);

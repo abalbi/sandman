@@ -49,6 +49,7 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
         app.get('/eventos.json', attachDB, attachSession, evento.list);
         app.get('/eventos.html', attachDB, attachSession, evento.tabla);
         app.get('/evento/guardar', attachDB, attachSession, evento.guardar);
+        app.get('/evento/borrar', attachDB, attachSession, evento.borrar);
         app.get('/proyecto.json', attachDB, attachSession, proyecto.traer);
         http.createServer(app).listen(config.port, function(){
             console.log('Express server listening on port ' + config.port);

@@ -20,7 +20,9 @@ block content
         input(ng-model="nuevo_evento.lugar") 
         | descripcion:
         input(ng-model="nuevo_evento.descripcion")
-        a(id="a_agregar_evento" ng-click="agregar_evento()") Agregar
+        a(id="guardar_evento" ng-click="guardar_evento()") Guardar
+         - 
+        a(id="borrar_evento" ng-click="borrar_evento(nuevo_evento._id)") Borrar
       table
         thead
           tr
