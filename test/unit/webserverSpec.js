@@ -7,6 +7,7 @@ var evento;
 var config;
 var MongoClient;
 var db;
+var objeto;
 
 describe('WebServer', function(){
   describe('Config', function(){
@@ -98,9 +99,76 @@ describe("Textos", function(){
   it("Debe convertir el texto en un array donde cada palabra pueda ser un texto o un objeto", function() {
     var texto = require('../../routes/texto');
     var tobj = texto.modelo.txt2tobj('Y Gaia vio a sus criaturas y de todas elegio a los Garou');
-  })
-})
+  });
+});
+describe("Objetos", function(){
+  beforeEach(function(){
+    proyecto = require('../../routes/proyecto');
+    proyecto.modelo._id = '__default__';
+    config = require('../../config')('test');
+    MongoClient = require('mongodb').MongoClient;
+    objeto = require('../../routes/objeto');
+  });
 
+  it('debe guardar un nuevo objeto', function(next){
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      proyecto.modelo.db = db;
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        objeto.guardar({
+          "db":db,
+          "param": function(name){
+            return '{"key":"Ivana"}';
+          }
+        },{
+          send: function(docs){
+            expect(docs.key).toBe('Ivana');
+            next();
+          }
+        });
+      });
+    });
+  });
+  it("debe guardar un objeto guardado", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      proyecto.modelo.db = db;
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Ivana"}],function(err, result){
+          var id = result[0]._id;
+          objeto.guardar({
+            "db":db,
+            "param": function(name){
+              var json = '{"key":"Ivanaa"}';
+              return json;
+            }
+          },{
+            send: function(docs){
+              expect(docs.key).toBe('Ivanaa');
+              next();
+            }
+          });
+        });
+      });
+    });
+  });
+  it("debe traer la lista de objetos", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Ivana"}],function(err, result){
+          objeto.list({"db":db},{
+            send: function(docs){
+              expect(docs[0].key).toBe('Ivana');
+              next();
+            }
+          });
+        }); 
+      });
+    });
+  });
+
+});
 describe("Eventos", function(){
   beforeEach(function(){
     proyecto = require('../../routes/proyecto');
