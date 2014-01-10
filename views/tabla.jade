@@ -12,18 +12,20 @@ block content
     h1= title
     p Welcome to #{title}
     div(ng-controller="TablaCtrl")
-      a(id="agregar_evento" href="#" ng-click="mostrar()") Agregar Evento
-      div(id="form_agregar_evento" ng-show="mostrar_evento") 
+      a(id="agregar_evento" href="#" ng-click="mostrar_editor_evento()") Agregar Evento
+      div(id="form_editar_evento" ng-show="mostrar_evento") 
         | fecha: 
         input(ng-model="nuevo_evento.fecha")
         | lugar:
         input(ng-model="nuevo_evento.lugar") 
         | descripcion:
+        br
         input(ng-model="nuevo_evento.descripcion")
         a(id="guardar_evento" ng-click="guardar_evento()") Guardar
-         - 
-        a(id="borrar_evento" ng-click="borrar_evento(nuevo_evento._id)") Borrar
-      table
+        a(id="editor_cancelar_evento" ng-click="editor_cancelar_evento()") Cancelar
+      div(id="form_editar_palabra" ng-show="mostrar_detalle_palabra")
+        {{palabra.palabra}}
+      table()
         thead
           tr
             td
@@ -35,6 +37,9 @@ block content
               {{mostrar_fecha(fecha)}}
             td(ng-repeat="(lugar, evento) in eventos.data")
               div(ng-repeat="(key, item) in evento")
-                span(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}") {{item.descripcion}}
+                span(ng-repeat="palabra in item.parseado" ng-click="ver_detalle_palabra(palabra)")
+                  {{palabra.palabra}} 
+                a(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}" class="editar") editar 
+                a(ng-click="borrar_evento(item._id)" class="borrar") borrar
 
 

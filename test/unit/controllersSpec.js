@@ -59,6 +59,6 @@ describe('controllers', function(){
       $httpBackend.expectGET('eventos.json').respond([]);
       scope.borrar_evento(_id);
       $httpBackend.flush();
-     }));
+    }));
   });
 });

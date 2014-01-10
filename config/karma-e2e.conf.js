@@ -10,7 +10,7 @@ module.exports = function(config){
     frameworks: ['ng-scenario'],
     singleRun : false,
     proxies : {
-      '/': 'http://localhost:4000/'
+      '/': 'http://localhost:3001/'
     },
     plugins : [
       'karma-junit-reporter',
