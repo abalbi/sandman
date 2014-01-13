@@ -7,7 +7,9 @@ var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
 var evento = require('./routes/evento');
+var palabra = require('./routes/palabra');
 var proyecto = require('./routes/proyecto');
+var objeto = require('./routes/objeto');
 var http = require('http');
 var path = require('path');
 var config = require('./config')();
@@ -41,7 +43,11 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
     } else {
         var attachDB = function(req, res, next) {
             req.db = db;
-            next();
+            db.collection('keys').ensureIndex({key:1},{unique:true}, function(){
+              db.collection('objetos').ensureIndex({key:1},{unique:true}, function(){
+                next();
+              });
+            });
         };
         var attachSession = proyecto.comprobar;
         app.get('/', attachDB, routes.index);
@@ -51,6 +57,8 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
         app.get('/evento/guardar', attachDB, attachSession, evento.guardar);
         app.get('/evento/borrar', attachDB, attachSession, evento.borrar);
         app.get('/proyecto.json', attachDB, attachSession, proyecto.traer);
+        app.get('/palabra/:palabra.json', attachDB, attachSession, palabra.traer);
+        app.get('/objeto/guardar', attachDB, attachSession, objeto.guardar);
         http.createServer(app).listen(config.port, function(){
             console.log('Express server listening on port ' + config.port);
         });

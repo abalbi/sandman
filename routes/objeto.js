@@ -5,6 +5,12 @@ var proyecto = require('./proyecto');
 exports.guardar = function(req, res){
   var db = req.db;
   var obj = JSON.parse(req.param('obj'));
+  if(!obj.keys) {
+    obj.keys = [];
+  }
+  if(obj.keys.indexOf(obj.key) == -1) {
+    obj.keys.push(obj.key);
+  }
   var objetos = db.collection('objetos');
   if(obj._id) {
     var query = {_id:obj._id};
@@ -23,8 +29,17 @@ exports.guardar = function(req, res){
 
 exports.list = function(req, res){
   var db = req.db;
-  var objetos = db.collection('eventos');
+  var objetos = db.collection('objetos');
   objetos.find().toArray(function (err, docs){
     res.send(docs);
   });
 };
+
+exports.traer = function(req, res) {
+  var db = req.db;
+  var objetos = db.collection('objetos');
+  objetos.find({"_id": req.param('_id')}).toArray(function (err, docs){
+    res.send(docs);
+  });
+}
+

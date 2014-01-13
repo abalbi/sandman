@@ -24,7 +24,11 @@ block content
         a(id="guardar_evento" ng-click="guardar_evento()") Guardar
         a(id="editor_cancelar_evento" ng-click="editor_cancelar_evento()") Cancelar
       div(id="form_editar_palabra" ng-show="mostrar_detalle_palabra")
-        {{palabra.palabra}}
+        div {{ palabra.palabra }}
+        a(ng-click="palabra.agregar_como_objeto()" ng-show="palabra.mostrar_agregar()")
+        div(ng-show="palabra.objetos.length == 0") Agregar como Objeto con key 
+          input(ng-model="palabra.key") 
+          a(ng-click="palabra.agregar()") agregar
       table()
         thead
           tr
@@ -37,7 +41,7 @@ block content
               {{mostrar_fecha(fecha)}}
             td(ng-repeat="(lugar, evento) in eventos.data")
               div(ng-repeat="(key, item) in evento")
-                span(ng-repeat="palabra in item.parseado" ng-click="ver_detalle_palabra(palabra)")
+                span(class="{{palabra.clase}}" ng-repeat="palabra in item.parseado" ng-click="ver_detalle_palabra(palabra)")
                   {{palabra.palabra}} 
                 a(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}" class="editar") editar 
                 a(ng-click="borrar_evento(item._id)" class="borrar") borrar

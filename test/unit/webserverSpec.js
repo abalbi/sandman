@@ -113,18 +113,22 @@ describe("Objetos", function(){
   it('debe guardar un nuevo objeto', function(next){
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       proyecto.modelo.db = db;
-      db.collection('objetos', function(err, collection){
-        collection.drop();
-        objeto.guardar({
-          "db":db,
-          "param": function(name){
-            return '{"key":"Ivana"}';
-          }
-        },{
-          send: function(docs){
-            expect(docs.key).toBe('Ivana');
-            next();
-          }
+      db.collection('objetos', function(err, objetos){
+        objetos.drop();
+        db.collection('keys', function(err, keys){
+          keys.drop();
+          objeto.guardar({
+            "db":db,
+            "param": function(name){
+              return '{"key":"Ivana", "keys":["Petrova"]}';
+            }
+          },{
+            send: function(docs){
+              expect(docs.key).toBe('Ivana');
+              expect(docs.keys.indexOf('Ivana')).not.toBe(-1);
+              next();
+            }
+          });
         });
       });
     });
@@ -145,6 +149,7 @@ describe("Objetos", function(){
           },{
             send: function(docs){
               expect(docs.key).toBe('Ivanaa');
+              expect(docs.keys.indexOf('Ivanaa')).not.toBe(-1);
               next();
             }
           });
@@ -167,7 +172,27 @@ describe("Objetos", function(){
       });
     });
   });
-
+  it("debe traer un objeto en particular", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Ivana"}],function(err, result){
+          var id = result[0]._id;
+          objeto.traer({
+            "db":db,
+            "param": function(name){
+              return id;
+            }
+          },{
+            send: function(docs){
+              expect(docs[0].key).toBe('Ivana');
+              next();
+            }
+          });
+        }); 
+      });
+    });
+  });
 });
 describe("Eventos", function(){
   beforeEach(function(){
@@ -177,7 +202,6 @@ describe("Eventos", function(){
     MongoClient = require('mongodb').MongoClient;
     evento = require('../../routes/evento');
   });
-
   it("debe guardar un nuevo evento", function(next) {
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       proyecto.modelo.db = db;
@@ -247,7 +271,7 @@ describe("Eventos", function(){
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       db.collection('eventos', function(err, collection){
         collection.drop();
-        collection.insert([{"lugar":"Lugar1","fecha":"1","descripcion":"[Ivana] Descripcion Lugar1 1"}],function(err, result){
+        collection.insert([{"lugar":"Lugar1","fecha":"1","descripcion":"Ivana Descripcion Lugar1 1"}],function(err, result){
           var id = result[0]._id;
           evento.traer({
             "db":db,
@@ -257,7 +281,7 @@ describe("Eventos", function(){
           },{
             send: function(docs){
               expect(docs[0].lugar).toBe('Lugar1');
-              expect(docs[0].descripcion).toBe('[Ivana] Descripcion Lugar1 1');
+              expect(docs[0].descripcion).toBe('Ivana Descripcion Lugar1 1');
               expect(docs[0].parseado[0].palabra).toBe("Ivana");
               expect(docs[0].parseado[1].palabra).toBe('Descripcion');
               expect(docs[0].fecha).toBe('1');
@@ -265,7 +289,7 @@ describe("Eventos", function(){
             }
           });
         }); 
-      });
+      }); 
     });
   });
   it("debe borrar un evento en particular", function(next) {
@@ -291,8 +315,44 @@ describe("Eventos", function(){
       });
     });
   });
+  function eventoDescripcionMockData(db, next) {
+    db.collection('objetos', function(err, objetos){
+      objetos.drop();
+      db.collection('keys', function(err, keys){
+        keys.drop();
+        objetos.insert(
+          [
+            {key: 'objeto1', keys:['objeto1', 'referencia']},
+            {key: 'objeto2', keys:['objeto2']},
+            {key: 'objeto3', keys:['objeto3']},
+            {key: 'Peron', keys:['Peron']},
+            {key: 'Isabelita', keys:['Isabel Peron','Isabelita']}
+          ],
+          function(err, result){
+            next();
+        });
+      });
+    });
+  }
+  it("debe crearse un conjunto de objetos para probar", function(next){
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      eventoDescripcionMockData(db, function(){
+        var evts = [
+          {descripcion: "objeto1 normal"},
+          {descripcion: "objeto2 anormal"},
+          {descripcion: "Silas trae denuevo a Peron. [Isabel Peron] Espera controlar asi a los descontentos y negociar con ellos contra la primogenitura"}
+        ];
+        evento.modelo.parsear(db, evts, function(evt2s) {
+          expect(evt2s[0].descripcion).toBe('objeto1 normal');
+          expect(evt2s[0].parseado[0].palabra).toBe('objeto1');
+          expect(evt2s[0].parseado[0].clase).toBe('objeto');
+          expect(evt2s[0].parseado[1].palabra).toBe('normal');
+          expect(evt2s[0].parseado[1].clase).toBe('');
+          expect(evt2s[2].parseado[4].palabra).toBe('Peron');
+          console.log(evt2s[2]);
+          next();  
+        });
+      })
+    });
+  });
 });
-
-
-
-

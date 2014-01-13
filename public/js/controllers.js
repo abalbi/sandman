@@ -3,6 +3,28 @@
 
 angular.module('burgo.controllers', []).
   controller('TablaCtrl', function($scope, $http, $sce) {
+    $scope.seleccionar_palabra = function(palabra) {
+      $http.get('palabra/' + palabra.palabra + '.json').success(function(data) {
+        $scope.palabra = data;
+        $scope.palabra.mostrar_agregar = function() {
+          $scope.palabra.key = $scope.palabra.palabra;
+          if(this.objetos.length != 0){ return false};
+          return true;
+        }
+        $scope.palabra.agregar = function() {
+          console.log('asdfasdfad');
+          var obj = {
+            "key": $scope.palabra.key
+          };
+          console.log(obj);
+          obj = JSON.stringify(obj);
+          $http.get('objeto/guardar?obj='+obj).success(function(data) {
+            $scope.tabla_cargar_eventos($http);
+          });
+        }
+      });
+    }
+    $scope.palabra = {};
     $scope.fecha_inicio = function(){
       return '1970:01:01:00:00:00';
     }
@@ -92,13 +114,12 @@ angular.module('burgo.controllers', []).
       });
       row.data[evento.lugar].push({"parseado" : evento.parseado, "fecha" : evento.fecha, "descripcion": evento.descripcion, "_id": evento._id});
     }
-    $scope.palabra = {};
     $scope.mostrar_detalle_palabra = false;
     $scope.ver_detalle_palabra = function(palabra) {
       if(!$scope.mostrar_detalle_palabra) {
         $scope.mostrar_detalle_palabra = true;
       }
-      $scope.palabra = palabra;
+      $scope.seleccionar_palabra(palabra);
     }
     $scope.agregar_lugar = function(lugar) {
       var boo = true;

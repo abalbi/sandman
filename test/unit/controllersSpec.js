@@ -60,5 +60,15 @@ describe('controllers', function(){
       scope.borrar_evento(_id);
       $httpBackend.flush();
     }));
+    it('debe manejar la seleccion de una palabra si esta no es ninguna en especial', inject(function(_$httpBackend_, $rootScope, $controller) {
+      var $httpBackend = _$httpBackend_;
+      var scope = {};
+      var ctrl = $controller('TablaCtrl', { $scope: scope});
+      $httpBackend.expectGET('eventos.json').respond([]);
+      $httpBackend.expectGET('palabra/Ivana.json').respond({palabra:"Ivana"});
+      scope.seleccionar_palabra({palabra:"Ivana"});
+      $httpBackend.flush();
+      expect(scope.palabra.palabra).toBe("Ivana");
+    }));
   });
 });
