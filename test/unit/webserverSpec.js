@@ -8,6 +8,7 @@ var config;
 var MongoClient;
 var db;
 var objeto;
+var palabra;
 
 describe('WebServer', function(){
   describe('Config', function(){
@@ -138,12 +139,12 @@ describe("Objetos", function(){
       proyecto.modelo.db = db;
       db.collection('objetos', function(err, collection){
         collection.drop();
-        collection.insert([{"key":"Ivana"}],function(err, result){
+        collection.insert([{"key":"Ivanaa"}],function(err, result){
           var id = result[0]._id;
           objeto.guardar({
             "db":db,
             "param": function(name){
-              var json = '{"key":"Ivanaa"}';
+              var json = '{"key":"Ivanaa","_id":"'+id+'"}';
               return json;
             }
           },{
@@ -201,6 +202,7 @@ describe("Eventos", function(){
     config = require('../../config')('test');
     MongoClient = require('mongodb').MongoClient;
     evento = require('../../routes/evento');
+    palabra = require('../../routes/palabra');
   });
   it("debe guardar un nuevo evento", function(next) {
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
@@ -346,13 +348,39 @@ describe("Eventos", function(){
           expect(evt2s[0].descripcion).toBe('objeto1 normal');
           expect(evt2s[0].parseado[0].palabra).toBe('objeto1');
           expect(evt2s[0].parseado[0].clase).toBe('objeto');
+          expect(evt2s[0].parseado[0].objeto).toBe('objeto1');
           expect(evt2s[0].parseado[1].palabra).toBe('normal');
           expect(evt2s[0].parseado[1].clase).toBe('');
           expect(evt2s[2].parseado[4].palabra).toBe('Peron');
-          console.log(evt2s[2]);
+          expect(evt2s[2].parseado[4].objeto).toBe('Peron');
+          expect(evt2s[2].parseado[6].palabra).toBe('Isabel Peron');
+          expect(evt2s[2].parseado[6].objeto).toBe('Isabelita');
           next();  
         });
       })
+    });
+  });
+  it("debe devolver una descripcion de la palabra", function(next){
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      eventoDescripcionMockData(db, function(){
+        palabra.traer(
+          {
+            "db": db,
+            param: function(){
+              return 'Isabel Peron'
+            }
+          },
+          {
+            send: function(docs) {
+              expect(docs.palabra).toBe('Isabel Peron');
+              expect(docs.alias).toBe(true);
+              expect(docs.key).toBe(false);
+              expect(docs.objeto.keys.indexOf('Isabel Peron')).not.toBe(-1);
+              next();
+            }
+          }
+        );
+      });        
     });
   });
 });

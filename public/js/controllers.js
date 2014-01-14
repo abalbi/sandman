@@ -6,21 +6,39 @@ angular.module('burgo.controllers', []).
     $scope.seleccionar_palabra = function(palabra) {
       $http.get('palabra/' + palabra.palabra + '.json').success(function(data) {
         $scope.palabra = data;
+        $scope.palabra.objeto_alias = {};
         $scope.palabra.mostrar_agregar = function() {
           $scope.palabra.key = $scope.palabra.palabra;
           if(this.objetos.length != 0){ return false};
           return true;
         }
-        $scope.palabra.agregar = function() {
-          console.log('asdfasdfad');
+        $scope.palabra.agregar_objeto = function() {
           var obj = {
-            "key": $scope.palabra.key
+            "key": $scope.palabra.palabra
           };
-          console.log(obj);
           obj = JSON.stringify(obj);
           $http.get('objeto/guardar?obj='+obj).success(function(data) {
             $scope.tabla_cargar_eventos($http);
           });
+        }
+        $scope.palabra.agregar_alias = function() {
+          var obj = this.objeto_alias;
+          obj.keys.push(this.palabra);
+          obj = JSON.stringify(obj);
+          $http.get('objeto/guardar?obj='+obj).success(function(data) {
+            $scope.tabla_cargar_eventos($http);
+            console.log(obj);
+            console.log(this);
+          });
+        }
+        $scope.palabra.elegir_objeto = function(objeto) {
+          $scope.palabra.alias_a_objeto = objeto.key;
+          $scope.palabra.objeto_alias = objeto;
+          $scope.palabra.mostrar_lista_objetos = false;
+        }
+        $scope.palabra.mostrar_lista_objetos = false;
+        $scope.palabra.cambio_alias_a_objeto = function(){
+          $scope.palabra.mostrar_lista_objetos = true;
         }
       });
     }
@@ -93,6 +111,7 @@ angular.module('burgo.controllers', []).
         });
       }
     }
+    $scope.objetos = [];
     $scope.lugares = [];
     $scope.tabla = {};
     $scope.tabla_evento = function(evento) {
@@ -139,6 +158,7 @@ angular.module('burgo.controllers', []).
     }
     $scope.tabla_cargar_eventos = function($http){
       $scope.eventos = [];
+      $scope.palabra = {};
       $http.get('eventos.json').success(function(data){
         angular.forEach(data, function(evento){
           $scope.eventos.push(evento);
@@ -148,6 +168,12 @@ angular.module('burgo.controllers', []).
         angular.forEach($scope.eventos, function(evento, key){
           $scope.tabla_evento(evento);
         });
+        $scope.cargar_objetos();
+      });
+    }
+    $scope.cargar_objetos = function() {
+      $http.get('objetos').success(function(data){
+        $scope.objetos = data;
       });
     }
     $scope.tabla_cargar_eventos($http);

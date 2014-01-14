@@ -13,7 +13,7 @@ exports.guardar = function(req, res){
   }
   var objetos = db.collection('objetos');
   if(obj._id) {
-    var query = {_id:obj._id};
+    var query = {_id:new ObjectID(obj._id)};
     delete obj._id;
     objetos.update(query,obj,{},function(err, docs){
       objetos.find({"_id": query._id}).toArray(function (err, docs){

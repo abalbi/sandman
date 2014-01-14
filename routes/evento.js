@@ -31,7 +31,10 @@ var modelo = {
       for(i in descripcion) {
         var palabra = descripcion[i];
         if(!indice[palabra]) {
-          indice[palabra] = {palabra:palabra, clase:''};
+          indice[palabra] = {
+            palabra:palabra,
+            clase:''
+          };
           palabras.push(palabra);
         }
       }
@@ -39,10 +42,11 @@ var modelo = {
     db.collection('objetos').find({keys:{$in:palabras}}).toArray(function (err, docs){
       for(ii in docs){
         doc = docs[ii];
-        for(iiiii in doc) {
-          key = doc[iiiii];
+        for(iiiii in doc.keys) {
+          key = doc.keys[iiiii];
           if(indice[key]) {
             indice[key].clase = 'objeto';
+            indice[key].objeto = doc.key;
           }
         }
       }

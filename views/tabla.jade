@@ -12,38 +12,56 @@ block content
     h1= title
     p Welcome to #{title}
     div(ng-controller="TablaCtrl")
-      a(id="agregar_evento" href="#" ng-click="mostrar_editor_evento()") Agregar Evento
-      div(id="form_editar_evento" ng-show="mostrar_evento") 
-        | fecha: 
-        input(ng-model="nuevo_evento.fecha")
-        | lugar:
-        input(ng-model="nuevo_evento.lugar") 
-        | descripcion:
-        br
-        input(ng-model="nuevo_evento.descripcion")
-        a(id="guardar_evento" ng-click="guardar_evento()") Guardar
-        a(id="editor_cancelar_evento" ng-click="editor_cancelar_evento()") Cancelar
-      div(id="form_editar_palabra" ng-show="mostrar_detalle_palabra")
-        div {{ palabra.palabra }}
-        a(ng-click="palabra.agregar_como_objeto()" ng-show="palabra.mostrar_agregar()")
-        div(ng-show="palabra.objetos.length == 0") Agregar como Objeto con key 
-          input(ng-model="palabra.key") 
-          a(ng-click="palabra.agregar()") agregar
-      table()
-        thead
-          tr
-            td
-            td(ng-repeat="lugar in lugares")
-              {{lugar}}
-        tbody
-          tr(ng-repeat="(fecha, eventos) in tabla")
-            td
-              {{mostrar_fecha(fecha)}}
-            td(ng-repeat="(lugar, evento) in eventos.data")
-              div(ng-repeat="(key, item) in evento")
-                span(class="{{palabra.clase}}" ng-repeat="palabra in item.parseado" ng-click="ver_detalle_palabra(palabra)")
-                  {{palabra.palabra}} 
-                a(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}" class="editar") editar 
-                a(ng-click="borrar_evento(item._id)" class="borrar") borrar
-
+      div(style="float:left;width:750px;")
+        a(id="agregar_evento" href="#" ng-click="mostrar_editor_evento()") Agregar Evento
+        div(id="form_editar_evento" ng-show="mostrar_evento") 
+          | fecha: 
+          input(ng-model="nuevo_evento.fecha")
+          | lugar:
+          input(ng-model="nuevo_evento.lugar") 
+          | descripcion:
+          br
+          input(ng-model="nuevo_evento.descripcion")
+          a(id="guardar_evento" ng-click="guardar_evento()") Guardar
+          a(id="editor_cancelar_evento" ng-click="editor_cancelar_evento()") Cancelar
+        div(id="form_editar_palabra" ng-show="palabra.palabra.length")
+          h2 {{ palabra.palabra }}
+          a(ng-click="palabra.agregar_como_objeto()" ng-show="!palabra.key && !palabra.alias")
+          div(ng-show="!palabra.key && !palabra.alias")
+            div Agregar como Objeto con key 
+              strong {{palabra.palabra}} 
+              a(ng-click="palabra.agregar_objeto()") agregar
+            div Agregar un alias al objeto
+              input(ng-model="palabra.alias_a_objeto" ng-change="palabra.cambio_alias_a_objeto()")
+              a(ng-click="palabra.agregar_alias()") agregar
+              ul(ng-show="palabra.mostrar_lista_objetos")
+                li(ng-repeat="objeto in objetos | filter:palabra.alias_a_objeto")
+                  span(ng-click="palabra.elegir_objeto(objeto)") {{objeto.key}}
+          div
+            div(ng-show="palabra.alias") Es alias del objeto 
+              a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
+            div(ng-show="palabra.key") Es el objeto 
+              a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
+        table()
+          thead
+            tr
+              td
+              td(ng-repeat="lugar in lugares")
+                {{lugar}}
+          tbody
+            tr(ng-repeat="(fecha, eventos) in tabla")
+              td
+                {{mostrar_fecha(fecha)}}
+              td(ng-repeat="(lugar, evento) in eventos.data")
+                div(ng-repeat="(key, item) in evento")
+                  span(class="{{palabra.clase}}" ng-repeat="palabra in item.parseado" ng-click="ver_detalle_palabra(palabra)")
+                    {{palabra.palabra}} 
+                  a(ng-click="modificar_evento(fecha, lugar, item)" alt="{{item.id}}" class="editar") editar 
+                  a(ng-click="borrar_evento(item._id)" class="borrar") borrar
+      div(ng-repeat="objeto in objetos" style="float:right;width:250px;")
+        span(ng-click="objeto.mostrar = !objeto.mostrar") {{objeto.key}}
+          div(ng-show="objeto.mostrar")
+            a(href="objeto/objeto.key}}.html") ver 
+            ul
+              li(ng-repeat="key in objeto.keys") {{key}}
 
