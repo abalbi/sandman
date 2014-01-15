@@ -60,8 +60,8 @@ block content
                   a(ng-click="borrar_evento(item._id)" class="borrar") borrar
       div(ng-repeat="objeto in objetos" style="float:right;width:250px;")
         span(ng-click="objeto.mostrar = !objeto.mostrar") {{objeto.key}}
-          div(ng-show="objeto.mostrar")
-            a(href="objeto/objeto.key}}.html") ver 
+          span(ng-show="objeto.mostrar") 
+            a(href="objeto/{{objeto.key}}.html") ver 
             ul
               li(ng-repeat="key in objeto.keys") {{key}}
 

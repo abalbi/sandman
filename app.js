@@ -50,7 +50,7 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
             });
         };
         var attachSession = proyecto.comprobar;
-        app.get('/', attachDB, routes.index);
+        app.get('/', attachDB, attachSession, evento.tabla);
         app.get('/users', attachDB, attachSession, user.list);
         app.get('/eventos.json', attachDB, attachSession, evento.list);
         app.get('/eventos.html', attachDB, attachSession, evento.tabla);
@@ -60,6 +60,8 @@ MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+con
         app.get('/palabra/:palabra.json', attachDB, attachSession, palabra.traer);
         app.get('/objeto/guardar', attachDB, attachSession, objeto.guardar);
         app.get('/objetos', attachDB, attachSession, objeto.list);
+        app.get('/objeto/:key.html', attachDB, attachSession, objeto.vista);
+        app.get('/objeto/:key.json', attachDB, attachSession, objeto.traer);
         http.createServer(app).listen(config.port, function(){
             console.log('Express server listening on port ' + config.port);
         });

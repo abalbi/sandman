@@ -2,6 +2,10 @@
 var ObjectID = require('mongodb').ObjectID;
 var proyecto = require('./proyecto');
 
+exports.vista = function(req, res){
+  res.render('objeto', { title: req.param('key') });
+};
+
 exports.guardar = function(req, res){
   var db = req.db;
   var obj = JSON.parse(req.param('obj'));
@@ -38,7 +42,8 @@ exports.list = function(req, res){
 exports.traer = function(req, res) {
   var db = req.db;
   var objetos = db.collection('objetos');
-  objetos.find({"_id": req.param('_id')}).toArray(function (err, docs){
+  var key = req.param('key');
+  objetos.find({"$or":[{"key": key},{"_id": key}]}).toArray(function (err, docs){
     res.send(docs);
   });
 }

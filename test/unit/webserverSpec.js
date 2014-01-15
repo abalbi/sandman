@@ -324,11 +324,12 @@ describe("Eventos", function(){
         keys.drop();
         objetos.insert(
           [
-            {key: 'objeto1', keys:['objeto1', 'referencia']},
-            {key: 'objeto2', keys:['objeto2']},
-            {key: 'objeto3', keys:['objeto3']},
-            {key: 'Peron', keys:['Peron']},
-            {key: 'Isabelita', keys:['Isabel Peron','Isabelita']}
+            {key: 'objeto1', keys:['objeto1', 'referencia'], tipo:"objeto"},
+            {key: 'objeto2', keys:['objeto2'], tipo:"objeto"},
+            {key: 'objeto3', keys:['objeto3'], tipo:"objeto"},
+            {key: 'Peron', keys:['Peron',['Juan Peron']], tipo:"objeto"},
+            {key: 'Lobos', keys:['Lobos'], tipo:"lugar"},
+            {key: 'Isabelita', keys:['Isabel Peron','Isabelita'], tipo:"objeto"}
           ],
           function(err, result){
             next();
@@ -342,9 +343,12 @@ describe("Eventos", function(){
         var evts = [
           {descripcion: "objeto1 normal"},
           {descripcion: "objeto2 anormal"},
-          {descripcion: "Silas trae denuevo a Peron. [Isabel Peron] Espera controlar asi a los descontentos y negociar con ellos contra la primogenitura"}
+          {descripcion: "Silas trae denuevo a Peron. Isabel Peron Espera controlar asi a los descontentos y negociar con ellos contra la primogenitura"},
+          {descripcion: "Peron nace en Lobos. [Juan Peron] vuelve a la vida"}
+
         ];
         evento.modelo.parsear(db, evts, function(evt2s) {
+          console.log(evt2s[3]);
           expect(evt2s[0].descripcion).toBe('objeto1 normal');
           expect(evt2s[0].parseado[0].palabra).toBe('objeto1');
           expect(evt2s[0].parseado[0].clase).toBe('objeto');
@@ -355,6 +359,8 @@ describe("Eventos", function(){
           expect(evt2s[2].parseado[4].objeto).toBe('Peron');
           expect(evt2s[2].parseado[6].palabra).toBe('Isabel Peron');
           expect(evt2s[2].parseado[6].objeto).toBe('Isabelita');
+          expect(evt2s[3].parseado[3].palabra).toBe('Lobos');
+          expect(evt2s[3].parseado[3].clase).toBe('lugar');
           next();  
         });
       })

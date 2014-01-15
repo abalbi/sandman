@@ -7,63 +7,90 @@ var proyecto = require('./proyecto');
 
 
 var modelo = {
-  split_descripcion: function(evento){
-    var str = evento.descripcion;
-    str = str.replace(/\[(.*)\]/, function(mat,palabra){
-      var palabra = palabra.replace(' ', '_');
-      return palabra;
-    });
-    str = str.replace('.',' .');
-    str = str.replace(',',' ,');
-    var array = str.split(' ');
-    for (i in array) {
-      palabra = array[i];
-      array[i] = palabra.replace('_',' ');
-    }
-    return array;
-  },
-  parsear: function(db, eventos, next) {
-    var indice = {};
-    var palabras = [];
-    for(ievt in eventos) {
-      evento = eventos[ievt];
-      var descripcion = modelo.split_descripcion(evento);
-      for(i in descripcion) {
-        var palabra = descripcion[i];
-        if(!indice[palabra]) {
-          indice[palabra] = {
-            palabra:palabra,
-            clase:''
-          };
-          palabras.push(palabra);
-        }
-      }
-    }
-    db.collection('objetos').find({keys:{$in:palabras}}).toArray(function (err, docs){
-      for(ii in docs){
-        doc = docs[ii];
-        for(iiiii in doc.keys) {
-          key = doc.keys[iiiii];
-          if(indice[key]) {
-            indice[key].clase = 'objeto';
-            indice[key].objeto = doc.key;
+  indice: function(db,cb){
+    var indice = {
+      data: {}
+    };
+    db.collection('objetos').find().toArray(function (err, docs){
+      for (i in docs) {
+        var doc = docs[i];
+        indice.data[doc.key] = doc;
+        if(doc.keys) {
+          for (ii in doc.keys) {
+            var key = doc.keys[ii];
+            indice.data[key] = doc;
           }
         }
       }
-      for(iii in eventos) {
-        var evento = eventos[iii];
-        if(!evento.parseado) {
-          evento.parseado = [];
+      var antes = [];
+      var despues = [];
+      for(prop in indice.data) {
+        var item = indice.data[prop];
+        if(prop.match(/ /)) {
+           antes.push(prop);
+        } else {
+           despues.push(prop);
         }
-        var descripcion = modelo.split_descripcion(evento);
-        for(iiii in descripcion) {
-          palabra = descripcion[iiii];
-          evento.parseado.push(indice[palabra]);
+      }
+      indice.orden = antes.concat(despues);
+      cb(indice);
+    });
+  },
+  parsear: function(db, eventos, next) {
+    this.indice(db, function(indice){
+      for(ievt in eventos) {
+        var parseado = [];
+        evento = eventos[ievt];
+        desc = evento.descripcion;
+        desc = desc.replace(/\[/,'').replace(/\]/,'');
+        for (o in indice.orden) {
+          var i = indice.orden[o];
+          var re = new RegExp(''+i+'','g');
+          desc = desc.replace(re,function(match,pre,palabra,post){
+            return '['+match+']';
+          },'g')
         }
+        desc = desc.replace(/\[([^\]]*\[.*)\]/g, function(match,p1){
+          return '['+p1.replace(/\[/,'').replace(/\]/,'')+']';
+        });
+        var c = 0;
+        console.log(desc);
+        while(desc){
+          var palabra = {
+            clase: ""
+          };
+          var boo = false;
+          desc = desc.replace(/^\[([^\]]+)\]/,function(match,p1){
+            palabra.palabra = p1;
+            console.log(p1);
+            console.log(indice.data[p1]);
+            palabra.clase = indice.data[p1].tipo;
+            palabra.objeto = indice.data[p1].key;
+            if(!evento.keys) {
+              evento.keys = {};
+            }
+            evento.keys[palabra.objeto] = palabra.objeto;
+            parseado[c] = palabra;
+            boo = true;
+            return '';
+          });
+          if(boo) {c++;continue}
+          desc = desc.replace(/^[^ ]+/,function(match){
+            palabra.palabra = match;
+            parseado[c] = palabra;
+            boo = true;
+            return '';
+          });
+          if(boo) {c++;continue}
+          desc = desc.replace(/^ */,function(match){
+            return '';
+          });
+        }
+        evento.parseado = parseado;
       }
       next(eventos);
     });
-  },
+  }
 };
 
 exports.modelo = modelo;

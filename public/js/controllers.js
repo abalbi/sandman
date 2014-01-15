@@ -2,6 +2,16 @@
 /* Controllers */
 
 angular.module('burgo.controllers', []).
+  controller('ObjetoCtrl', function($scope, $http,$location) {
+    $scope.objeto = {};
+    $scope.objeto.key = $location.absUrl().match(/\/([^/]*)\.html/)[1];
+    $scope.cargar = function(){
+      $http.get('/objeto/' + $scope.objeto.key + '.json').success(function(data) {
+        console.log(data);
+      });
+    }
+    $scope.cargar();
+  }).
   controller('TablaCtrl', function($scope, $http, $sce) {
     $scope.seleccionar_palabra = function(palabra) {
       $http.get('palabra/' + palabra.palabra + '.json').success(function(data) {
@@ -23,12 +33,11 @@ angular.module('burgo.controllers', []).
         }
         $scope.palabra.agregar_alias = function() {
           var obj = this.objeto_alias;
+          delete obj["$$hashKey"];
           obj.keys.push(this.palabra);
           obj = JSON.stringify(obj);
           $http.get('objeto/guardar?obj='+obj).success(function(data) {
             $scope.tabla_cargar_eventos($http);
-            console.log(obj);
-            console.log(this);
           });
         }
         $scope.palabra.elegir_objeto = function(objeto) {
