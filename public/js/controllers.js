@@ -123,6 +123,60 @@ angular.module('burgo.controllers', []).
     $scope.objetos = [];
     $scope.lugares = [];
     $scope.tabla = {};
+    $scope.tabla2 = {
+      data: {},
+      actualizar: function(){
+        var self = this;
+        $scope.eventos = [];
+        $http.get('eventos.json').success(function(data){
+          angular.forEach(data, function(evento){
+            $scope.eventos.push(evento);
+          });
+          $scope.tabla2.data = {};
+          var keys = self.traer_keys();
+          angular.forEach($scope.eventos, function(evento, k){
+            angular.forEach(keys, function(key){
+              if(!$scope.tabla2.data[key]) {
+                $scope.tabla2.data[key] = {
+                  data: {}
+                }
+              }
+              if(!$scope.tabla2.data[key].data[evento.fecha]) {
+                $scope.tabla2.data[key].data[evento.fecha] = [];
+              }
+              if(evento.keys[key]) {
+                $scope.tabla2.data[key].data[evento.fecha].push(evento);
+              }
+            });
+          })
+        });
+        console.log(self);
+      },
+      traer_keys: function() {
+        var keys = {};
+        angular.forEach($scope.eventos, function(evento, key){
+          angular.forEach(evento.keys, function(value){
+            keys[value] = value;
+          });
+        });
+        return keys;
+      }
+    }
+    $scope.tabla_cargar_eventos = function($http){
+      $scope.eventos = [];
+      $scope.palabra = {};
+      $http.get('eventos.json').success(function(data){
+        angular.forEach(data, function(evento){
+          $scope.eventos.push(evento);
+        });
+        $scope.tabla = {};
+        $scope.actualizar_lugares();
+        angular.forEach($scope.eventos, function(evento, key){
+          $scope.tabla_evento(evento);
+        });
+        $scope.cargar_objetos();
+      });
+    }
     $scope.tabla_evento = function(evento) {
       if(!evento) return;
       var fecha = $scope.fecha_convertir(evento.fecha);
@@ -165,26 +219,12 @@ angular.module('burgo.controllers', []).
       });
       return $scope.lugares;
     }
-    $scope.tabla_cargar_eventos = function($http){
-      $scope.eventos = [];
-      $scope.palabra = {};
-      $http.get('eventos.json').success(function(data){
-        angular.forEach(data, function(evento){
-          $scope.eventos.push(evento);
-        });
-        $scope.tabla = {};
-        $scope.actualizar_lugares();
-        angular.forEach($scope.eventos, function(evento, key){
-          $scope.tabla_evento(evento);
-        });
-        $scope.cargar_objetos();
-      });
-    }
     $scope.cargar_objetos = function() {
       $http.get('objetos').success(function(data){
         $scope.objetos = data;
       });
     }
     $scope.tabla_cargar_eventos($http);
+    $scope.tabla2.actualizar();
   })
 ;

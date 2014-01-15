@@ -65,6 +65,9 @@ var modelo = {
             console.log(p1);
             console.log(indice.data[p1]);
             palabra.clase = indice.data[p1].tipo;
+            if(!palabra.clase) {
+              palabra.clase = 'objeto';
+            }
             palabra.objeto = indice.data[p1].key;
             if(!evento.keys) {
               evento.keys = {};
