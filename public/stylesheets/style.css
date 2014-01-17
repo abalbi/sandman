@@ -8,5 +8,27 @@ a {
 }
 
 .objeto {
-  color: #8000FF;
+  background: LightCyan;
+  margin: 2px;
+  padding: 2px;
+  border-radius: 25px;
+  border: 2px solid;
+  border-color: black;
+}
+
+div.objeto {
+  margin: 10px;
+  padding: 10px;
+}
+
+div.fecha {
+  background: #E0E0E0;
+  margin: 2px;
+  padding: 2px;
+  border-radius: 25px;
+  border: 2px solid;
+  border-color: black;
+  margin: 10px;
+  padding: 10px;
+
 }

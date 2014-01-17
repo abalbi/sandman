@@ -1,17 +1,6 @@
 extends layout
 
 block content
-  style(type='text/css').
-    div.columna {
-      background: #E0E0E0;
-      margin: 2px;
-      padding: 2px;
-    }
-    div.fecha {
-      margin: 2px;
-      padding: 2px;
-      border: 2px;
-    }
   script(src="lib/angular/angular.js")
   script(src="lib/angular/angular-route.js")
   script(src="js/app.js")
@@ -51,14 +40,17 @@ block content
               a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
             div(ng-show="palabra.key") Es el objeto 
               a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
+      h2 Objetos        
       div(id="objetos")
-        div(ng-repeat="objeto in objetos" id="{{objeto.key}}")
-          span(ng-click="objeto.mostrar = !objeto.mostrar") {{objeto.key}}
+        div(ng-click="objeto.mostrar = !objeto.mostrar" ng-repeat="objeto in objetos" id="{{objeto.key}}" class="objeto")
+          span {{objeto.key}}
           span(ng-show="objeto.mostrar") 
             a(href="objeto/{{objeto.key}}.html" class="ver") ver 
             ul
               li(ng-repeat="key in objeto.keys") {{key}}
-      div(id="tabla2" ng-repeat="(fecha, eventos) in tabla2.data" class="columna")
+      hr
+      h2 Eventos
+      div(id="tabla2" ng-repeat="(fecha, eventos) in tabla2.data" class="fecha")
         div(style="float:left") {{fecha}}
         div(style="float:left") 
           ul
