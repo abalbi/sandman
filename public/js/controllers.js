@@ -7,7 +7,6 @@ angular.module('burgo.controllers', []).
     $scope.objeto.key = $location.absUrl().match(/\/([^/]*)\.html/)[1];
     $scope.cargar = function(){
       $http.get('/objeto/' + $scope.objeto.key + '.json').success(function(data) {
-        console.log(data);
       });
     }
     $scope.cargar();
@@ -28,7 +27,8 @@ angular.module('burgo.controllers', []).
           };
           obj = JSON.stringify(obj);
           $http.get('objeto/guardar?obj='+obj).success(function(data) {
-            $scope.tabla_cargar_eventos($http);
+            //$scope.tabla_cargar_eventos($http);
+            $scope.tabla2.actualizar();
           });
         }
         $scope.palabra.agregar_alias = function() {
@@ -37,7 +37,8 @@ angular.module('burgo.controllers', []).
           obj.keys.push(this.palabra);
           obj = JSON.stringify(obj);
           $http.get('objeto/guardar?obj='+obj).success(function(data) {
-            $scope.tabla_cargar_eventos($http);
+            //$scope.tabla_cargar_eventos($http);
+            $scope.tabla2.actualizar();
           });
         }
         $scope.palabra.elegir_objeto = function(objeto) {
@@ -105,16 +106,18 @@ angular.module('burgo.controllers', []).
     $scope.borrar_evento = function(_id) {
       $http.get('evento/borrar?_id='+_id).success(function(data){
         $scope.tabla_evento(data);
-        $scope.tabla_cargar_eventos($http);
+        //$scope.tabla_cargar_eventos($http);
+        $scope.tabla2.actualizar();
         $scope.nuevo_evento = {};
         $scope.mostrar_evento = false;
       });
     }
     $scope.guardar_evento = function(){
-      if ($scope.nuevo_evento.fecha && $scope.nuevo_evento.lugar && $scope.nuevo_evento.descripcion) {
+      if ($scope.nuevo_evento.fecha && $scope.nuevo_evento.descripcion) {
         $http.get('evento/guardar?obj='+JSON.stringify($scope.nuevo_evento)).success(function(data){
           $scope.tabla_evento(data);
-          $scope.tabla_cargar_eventos($http);
+          //$scope.tabla_cargar_eventos($http);
+          $scope.tabla2.actualizar();
           $scope.nuevo_evento = {};
           $scope.mostrar_evento = false;
         });
@@ -133,27 +136,19 @@ angular.module('burgo.controllers', []).
             $scope.eventos.push(evento);
           });
           $scope.tabla2.data = {};
-          var keys = self.traer_keys();
           angular.forEach($scope.eventos, function(evento, k){
-            angular.forEach(keys, function(key){
-              if(!$scope.tabla2.data[key]) {
-                $scope.tabla2.data[key] = {
-                  data: {}
-                }
-              }
-              if(!$scope.tabla2.data[key].data[evento.fecha]) {
-                $scope.tabla2.data[key].data[evento.fecha] = [];
-              }
-              if(evento.keys[key]) {
-                $scope.tabla2.data[key].data[evento.fecha].push(evento);
-              }
-            });
+            var fecha = $scope.fecha_convertir(evento.fecha);
+            if(!$scope.tabla2.data[fecha]) {
+              $scope.tabla2.data[fecha] = [];
+            }
+            $scope.tabla2.data[fecha].push(evento);
           })
         });
-        console.log(self);
+        $scope.cargar_objetos();
       },
       traer_keys: function() {
         var keys = {};
+        keys["__sin__"] = "__sin__";
         angular.forEach($scope.eventos, function(evento, key){
           angular.forEach(evento.keys, function(value){
             keys[value] = value;
@@ -224,7 +219,7 @@ angular.module('burgo.controllers', []).
         $scope.objetos = data;
       });
     }
-    $scope.tabla_cargar_eventos($http);
+    //$scope.tabla_cargar_eventos($http);
     $scope.tabla2.actualizar();
   })
 ;

@@ -1,5 +1,5 @@
 {
-  "name": "application-name",
+  "name": "sandman",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -14,5 +14,20 @@
   "devDependencies": {
     "karma-junit-reporter": "~0.2.1",
     "karma-ng-scenario": "~0.1.0"
-  }
+  },
+  "description": "sandman =======",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abalbi/sandman.git"
+  },
+  "author": "abalbi",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/abalbi/sandman/issues"
+  },
+  "homepage": "https://github.com/abalbi/sandman"
 }
