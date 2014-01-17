@@ -62,8 +62,6 @@ var modelo = {
           var boo = false;
           desc = desc.replace(/^\[([^\]]+)\]/,function(match,p1){
             palabra.palabra = p1;
-            console.log(p1);
-            console.log(indice.data[p1]);
             palabra.clase = indice.data[p1].tipo;
             if(!palabra.clase) {
               palabra.clase = 'objeto';

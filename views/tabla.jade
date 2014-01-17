@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  style(type='text/css')
+  style(type='text/css').
     div.columna {
       background: #E0E0E0;
       margin: 2px;
@@ -35,14 +35,14 @@ block content
           a(id="editor_cancelar_evento" ng-click="editor_cancelar_evento()") Cancelar
         div(id="form_editar_palabra" ng-show="palabra.palabra.length")
           h2 {{ palabra.palabra }}
-          a(ng-click="palabra.agregar_como_objeto()" ng-show="!palabra.key && !palabra.alias")
+          a(class="cerrar" ng-click="palabra.palabra = ''") cerrar
           div(ng-show="!palabra.key && !palabra.alias")
             div Agregar como Objeto con key 
               strong {{palabra.palabra}} 
-              a(ng-click="palabra.agregar_objeto()") agregar
+              a(ng-click="palabra.agregar_objeto()" class="agregar") agregar
             div Agregar un alias al objeto
               input(ng-model="palabra.alias_a_objeto" ng-change="palabra.cambio_alias_a_objeto()")
-              a(ng-click="palabra.agregar_alias()") agregar
+              a(ng-click="palabra.agregar_alias()" class="agregar") agregar
               ul(ng-show="palabra.mostrar_lista_objetos")
                 li(ng-repeat="objeto in objetos | filter:palabra.alias_a_objeto")
                   span(ng-click="palabra.elegir_objeto(objeto)") {{objeto.key}}
@@ -51,13 +51,14 @@ block content
               a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
             div(ng-show="palabra.key") Es el objeto 
               a(href="objeto/{{palabra.objeto.key}}.html") {{palabra.objeto.key}}
-      div(ng-repeat="objeto in objetos")
-        span(ng-click="objeto.mostrar = !objeto.mostrar") {{objeto.key}}
+      div(id="objetos")
+        div(ng-repeat="objeto in objetos" id="{{objeto.key}}")
+          span(ng-click="objeto.mostrar = !objeto.mostrar") {{objeto.key}}
           span(ng-show="objeto.mostrar") 
-            a(href="objeto/{{objeto.key}}.html") ver 
+            a(href="objeto/{{objeto.key}}.html" class="ver") ver 
             ul
               li(ng-repeat="key in objeto.keys") {{key}}
-      div(ng-repeat="(fecha, eventos) in tabla2.data" class="columna")
+      div(id="tabla2" ng-repeat="(fecha, eventos) in tabla2.data" class="columna")
         div(style="float:left") {{fecha}}
         div(style="float:left") 
           ul

@@ -32,14 +32,10 @@ describe('controllers', function(){
       var scope = {};
       var ctrl = $controller('TablaCtrl', { $scope: scope});
       scope.tabla = {};
-      $httpBackend.expectGET('objetos').respond([]);
+      $httpBackend.expectGET('/objetos').respond([]);
       $httpBackend.flush();
-      expect(scope.tabla['1970:01:02:00:00:00'].data.A.length).toBe(2);
-      expect(scope.tabla['1970:01:02:00:00:00'].data.B.length).toBe(1);
-      expect(scope.tabla['1970:01:02:00:00:00'].data.C.length).toBe(0);
-      expect(scope.tabla['1970:01:03:00:00:00'].data.A.length).toBe(1);
-      expect(scope.tabla['1970:01:03:00:00:00'].data.B.length).toBe(0); 
-      expect(scope.tabla['1970:01:03:00:00:00'].data.C.length).toBe(1);
+      expect(scope.tabla2.data['1970:01:02:00:00:00'].length).toBe(3);
+      expect(scope.tabla2.data['1970:01:03:00:00:00'].length).toBe(2);
     }));
     it('debe poder agregar un evento y mandarlo a backend', inject(function(_$httpBackend_, $rootScope, $controller) {
       var $httpBackend = _$httpBackend_;
@@ -55,10 +51,10 @@ describe('controllers', function(){
       var scope = {};
       var _id = "__un_id__";
       $httpBackend.expectGET('eventos.json').respond([]);
+      $httpBackend.expectGET('/objetos').respond([]);
       $httpBackend.expectGET('evento/borrar?_id='+_id).respond([]);
-      $httpBackend.expectGET('objetos').respond([]);
       $httpBackend.expectGET('eventos.json').respond([]);
-      $httpBackend.expectGET('objetos').respond([]);
+      $httpBackend.expectGET('/objetos').respond([]);
       var ctrl = $controller('TablaCtrl', { $scope: scope});
       scope.borrar_evento(_id);
       $httpBackend.flush();
@@ -68,8 +64,8 @@ describe('controllers', function(){
       var scope = {};
       var ctrl = $controller('TablaCtrl', { $scope: scope});
       $httpBackend.expectGET('eventos.json').respond([]);
+      $httpBackend.expectGET('/objetos').respond([]);
       $httpBackend.expectGET('palabra/Ivana.json').respond({palabra:"Ivana"});
-      $httpBackend.expectGET('objetos').respond([]);
       scope.seleccionar_palabra({palabra:"Ivana"});
       $httpBackend.flush();
       expect(scope.palabra.palabra).toBe("Ivana");

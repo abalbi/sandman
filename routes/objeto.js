@@ -26,7 +26,11 @@ exports.guardar = function(req, res){
     });
   } else {
     objetos.insert(obj,function(err, docs){
-      res.send(docs[0]);
+      if(err) {
+        res.send(err);  
+      } else {
+        res.send(docs[0]);
+      }
     });
   }
 };

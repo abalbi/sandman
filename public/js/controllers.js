@@ -25,18 +25,25 @@ angular.module('burgo.controllers', []).
           var obj = {
             "key": $scope.palabra.palabra
           };
+          delete obj["$$hashKey"]; 
           obj = JSON.stringify(obj);
-          $http.get('objeto/guardar?obj='+obj).success(function(data) {
-            //$scope.tabla_cargar_eventos($http);
+          $http.get('/objeto/guardar?obj='+obj).success(function(data) {
             $scope.tabla2.actualizar();
           });
         }
         $scope.palabra.agregar_alias = function() {
           var obj = this.objeto_alias;
+          if(!obj.key) {
+            angular.forEach($scope.objetos, function(ob){
+              if(ob.key == $scope.palabra.alias_a_objeto) {
+                obj = ob;
+              }
+            }) 
+          }
           delete obj["$$hashKey"];
           obj.keys.push(this.palabra);
           obj = JSON.stringify(obj);
-          $http.get('objeto/guardar?obj='+obj).success(function(data) {
+          $http.get('/objeto/guardar?obj='+obj).success(function(data) {
             //$scope.tabla_cargar_eventos($http);
             $scope.tabla2.actualizar();
           });
@@ -106,7 +113,6 @@ angular.module('burgo.controllers', []).
     $scope.borrar_evento = function(_id) {
       $http.get('evento/borrar?_id='+_id).success(function(data){
         $scope.tabla_evento(data);
-        //$scope.tabla_cargar_eventos($http);
         $scope.tabla2.actualizar();
         $scope.nuevo_evento = {};
         $scope.mostrar_evento = false;
@@ -116,7 +122,6 @@ angular.module('burgo.controllers', []).
       if ($scope.nuevo_evento.fecha && $scope.nuevo_evento.descripcion) {
         $http.get('evento/guardar?obj='+JSON.stringify($scope.nuevo_evento)).success(function(data){
           $scope.tabla_evento(data);
-          //$scope.tabla_cargar_eventos($http);
           $scope.tabla2.actualizar();
           $scope.nuevo_evento = {};
           $scope.mostrar_evento = false;
@@ -215,11 +220,10 @@ angular.module('burgo.controllers', []).
       return $scope.lugares;
     }
     $scope.cargar_objetos = function() {
-      $http.get('objetos').success(function(data){
+      $http.get('/objetos').success(function(data){
         $scope.objetos = data;
       });
     }
-    //$scope.tabla_cargar_eventos($http);
     $scope.tabla2.actualizar();
   })
 ;
