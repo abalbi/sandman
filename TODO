@@ -1,9 +1,15 @@
 WEP:
-Baja de objetos
+Normalizar urls .json y .html
 
 TODO:
-Mostrar ventana agregar_evento como modal
 Mostrar ventana form_editar_palabra como modal
+Mostrar ventana agregar_evento como modal
+Crear url para limpiar db en los e2e-test
+Agregar a objeto una descripcion parseable
+Abstraer las descripciones en un middware
+Guardar objetos por key y por _id
 
 DONE:
+Traer objetos por key y por _id
+Baja de objetos por key y por _id
 Dar estilos a la parte de objetos

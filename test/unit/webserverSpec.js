@@ -173,7 +173,7 @@ describe("Objetos", function(){
       });
     });
   });
-  it("debe traer un objeto en particular", function(next) {
+  it("debe traer un objeto en particular por _id", function(next) {
     MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
       db.collection('objetos', function(err, collection){
         collection.drop();
@@ -182,7 +182,7 @@ describe("Objetos", function(){
           objeto.traer({
             "db":db,
             "param": function(name){
-              return id;
+              return name == 'key' ? '' : id;
             }
           },{
             send: function(docs){
@@ -194,6 +194,74 @@ describe("Objetos", function(){
       });
     });
   });
+  it("debe traer un objeto en particular por key", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Ivana"}],function(err, result){
+          var id = result[0]._id;
+          objeto.traer({
+            "db":db,
+            "param": function(name){
+              return name == 'key' ? 'Ivana' : '';
+            }
+          },{
+            send: function(docs){
+              expect(docs[0].key).toBe('Ivana');
+              next();
+            }
+          });
+        }); 
+      });
+    });
+  });
+  it("debe borrar un objeto en particular por _id", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Luana", "keys":"Luana"}],function(err, result){
+          var id = result[0]._id.toString();
+          objeto.borrar({
+            "db":db,
+            "param": function(name){
+              return name == 'key' ? '' : id;
+            }
+          },{
+            send: function(docs){
+              collection.find({"_id": id}).toArray(function (err, docs){
+                expect(docs.length).toBe(0);
+                next();
+              });
+            }
+          });
+        }); 
+      });
+    });
+  });
+  it("debe borrar un objeto en particular por key", function(next) {
+    MongoClient.connect('mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db, function(err, db) {
+      db.collection('objetos', function(err, collection){
+        collection.drop();
+        collection.insert([{"key":"Luana", "keys":"Luana"}],function(err, result){
+          var id = result[0]._id.toString();
+          objeto.borrar({
+            "db":db,
+            "param": function(name){
+              return name == 'key' ? 'Luana' : '';
+            }
+          },{
+            send: function(docs){
+              collection.find({"_id": id}).toArray(function (err, docs){
+                expect(docs.length).toBe(0);
+                next();
+              });
+            }
+          });
+        }); 
+      });
+    });
+  });
+
 });
 describe("Eventos", function(){
   beforeEach(function(){

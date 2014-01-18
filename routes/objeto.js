@@ -46,9 +46,31 @@ exports.list = function(req, res){
 exports.traer = function(req, res) {
   var db = req.db;
   var objetos = db.collection('objetos');
-  var key = req.param('key');
-  objetos.find({"$or":[{"key": key},{"_id": key}]}).toArray(function (err, docs){
+  var query = {
+    "$or": [
+      {key: req.param('key')}
+    ]
+  };
+  if(/^[0-9A-F]{24}$/i.test(req.param('_id')) || /^[0-9A-F]{12}$/i.test(req.param('_id')) ) {
+    query["$or"].push({"_id": new ObjectID(req.param('_id').toString())}); 
+  }
+  objetos.find(query).toArray(function (err, docs){
     res.send(docs);
   });
 }
 
+exports.borrar = function(req, res) {
+  var db = req.db;
+  var objetos = db.collection('objetos');
+  var query = {
+    "$or": [
+      {key: req.param('key')}
+    ]
+  };
+  if(/^[0-9A-F]{24}$/i.test(req.param('_id')) || /^[0-9A-F]{12}$/i.test(req.param('_id')) ) {
+    query["$or"].push({"_id": new ObjectID(req.param('_id'))}); 
+  }
+  objetos.remove(query, {w:1}, function(err, docs){
+    res.send([]);
+  });
+}
